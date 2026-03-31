@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import ReviewSection from "./ReviewSection";
 
 export interface LunchPick {
   restaurantName: string;
@@ -172,6 +173,7 @@ export default function LunchCard({ result, weather, onShare, onReshuffle, onRet
                   href={pick.placeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onPointerDownCapture={(e) => e.stopPropagation()}
                   className="mt-3 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-white/5 border border-[var(--card-border)] text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                 >
                   🗺️ 지도 · 리뷰 · 메뉴 보기
@@ -196,6 +198,12 @@ export default function LunchCard({ result, weather, onShare, onReshuffle, onRet
           />
         ))}
       </div>
+
+      {/* Review */}
+      <ReviewSection
+        restaurantName={pick.restaurantName}
+        placeUrl={pick.placeUrl}
+      />
 
       {/* Actions */}
       <div className="mt-4 flex flex-col gap-2">
