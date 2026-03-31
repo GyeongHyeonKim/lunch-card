@@ -113,12 +113,12 @@ async function enrichWithImages(places: KakaoPlace[]): Promise<KakaoPlace[]> {
 
 // Map category labels to Kakao-searchable keywords
 const CATEGORY_SEARCH_KEYWORDS: Record<string, string> = {
-  "따뜻한 국물": "국밥 탕",
+  "따뜻한 국물": "국밥",
   "가벼운 샐러드": "샐러드",
-  "면 요리": "라멘 국수",
-  "한정식/백반": "한정식 백반",
-  "카레/덮밥": "카레 덮밥",
-  "피자/버거": "피자 버거",
+  "면 요리": "라멘",
+  "한정식/백반": "한정식",
+  "카레/덮밥": "카레",
+  "피자/버거": "피자",
 };
 
 async function fetchNearbyRestaurants(lat: number, lng: number, radius: number = 500, keyword?: string): Promise<KakaoPlace[]> {
