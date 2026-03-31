@@ -111,12 +111,23 @@ async function enrichWithImages(places: KakaoPlace[]): Promise<KakaoPlace[]> {
   );
 }
 
+// Map category labels to Kakao-searchable keywords
+const CATEGORY_SEARCH_KEYWORDS: Record<string, string> = {
+  "따뜻한 국물": "국밥 탕",
+  "가벼운 샐러드": "샐러드",
+  "면 요리": "라멘 국수",
+  "한정식/백반": "한정식 백반",
+  "카레/덮밥": "카레 덮밥",
+  "피자/버거": "피자 버거",
+};
+
 async function fetchNearbyRestaurants(lat: number, lng: number, radius: number = 500, keyword?: string): Promise<KakaoPlace[]> {
   const apiKey = process.env.KAKAO_REST_API_KEY;
   if (!apiKey) return [];
 
-  // Use keyword search when category is specified, otherwise general category search
-  const query = keyword ? encodeURIComponent(keyword) : null;
+  // Map category labels to better search keywords for Kakao
+  const searchKeyword = keyword ? (CATEGORY_SEARCH_KEYWORDS[keyword] || keyword) : null;
+  const query = searchKeyword ? encodeURIComponent(searchKeyword) : null;
   const url = query
     ? `https://dapi.kakao.com/v2/local/search/keyword.json?query=${query}&x=${lng}&y=${lat}&radius=${radius}&sort=distance&size=15`
     : `https://dapi.kakao.com/v2/local/search/category.json?category_group_code=FD6&x=${lng}&y=${lat}&radius=${radius}&sort=distance&size=15`;
