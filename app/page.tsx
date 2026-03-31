@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Roulette from "./components/Roulette";
+import CategoryGrid from "./components/CategoryGrid";
 import LunchCard, { LunchResult, LunchPick } from "./components/LunchCard";
 import ContextBar from "./components/ContextBar";
 import FilterBar, { Filters } from "./components/FilterBar";
@@ -30,6 +31,7 @@ export default function Home() {
   const [rouletteResult, setRouletteResult] = useState<{ emoji: string; label: string } | null>(null);
   const [filters, setFilters] = useState<Filters>({ distance: 500, people: "small", price: "mid" });
   const [seenNames, setSeenNames] = useState<string[]>([]);
+  const [tab, setTab] = useState<"roulette" | "category">("roulette");
 
   // Get current time string
   const getTimeString = () => {
@@ -163,6 +165,15 @@ export default function Home() {
     [location, filters, seenNames]
   );
 
+  const handleCategorySelect = useCallback(
+    (category: { emoji: string; label: string }) => {
+      setResult(null);
+      setRouletteResult(null);
+      handleRouletteResult(category);
+    },
+    [handleRouletteResult]
+  );
+
   const handleShare = useCallback((pick: LunchPick) => {
     if (!result) return;
 
@@ -212,6 +223,7 @@ export default function Home() {
     setResult(null);
     setRouletteResult(null);
     setSeenNames([]);
+    setTab("roulette");
   }, []);
 
   return (
@@ -234,14 +246,38 @@ export default function Home() {
         loading={contextLoading}
       />
 
-      {/* Filters — only show on intro */}
+      {/* Tab bar + Filters — only show on intro */}
       {phase === "intro" && (
-        <FilterBar filters={filters} onChange={setFilters} />
+        <>
+          <div className="flex gap-1 mb-4 p-1 rounded-xl bg-white/5 border border-[var(--card-border)]">
+            <button
+              onClick={() => setTab("roulette")}
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                tab === "roulette"
+                  ? "bg-[var(--accent)] text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              🎰 룰렛
+            </button>
+            <button
+              onClick={() => setTab("category")}
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                tab === "category"
+                  ? "bg-[var(--accent)] text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              📋 카테고리
+            </button>
+          </div>
+          <FilterBar filters={filters} onChange={setFilters} />
+        </>
       )}
 
       {/* Main content */}
       <AnimatePresence mode="wait">
-        {(phase === "intro" || phase === "spinning") && (
+        {(phase === "intro" || phase === "spinning") && tab === "roulette" && (
           <motion.div
             key="roulette"
             initial={{ opacity: 0 }}
@@ -254,6 +290,17 @@ export default function Home() {
               onSpin={handleSpin}
               result={rouletteResult}
             />
+          </motion.div>
+        )}
+
+        {phase === "intro" && tab === "category" && (
+          <motion.div
+            key="category"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <CategoryGrid onSelect={handleCategorySelect} />
           </motion.div>
         )}
 
