@@ -12,7 +12,7 @@ const LunchPickSchema = z.object({
 
 const LunchResultSchema = z.object({
   moodTag: z.string().describe("오늘의 무드 태그 (예: 따뜻한 날, 매운 날, 가벼운 점심)"),
-  picks: z.array(LunchPickSchema).describe("정확히 3개의 음식점 추천"),
+  picks: z.array(LunchPickSchema).describe("정확히 5개의 음식점 추천"),
 });
 
 const FallbackResultSchema = z.object({
@@ -22,7 +22,7 @@ const FallbackResultSchema = z.object({
     menu: z.string().describe("추천 메뉴 (한 가지)"),
     reason: z.string().describe("추천 이유 (1문장, 친근한 말투)"),
     moodEmoji: z.string().describe("분위기를 나타내는 이모지 하나"),
-  })).describe("정확히 3개의 음식점 추천"),
+  })).describe("정확히 5개의 음식점 추천"),
 });
 
 interface KakaoPlace {
@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
 
     // Filter out previously seen restaurants
     let filtered = restaurants.filter((r) => !excludeSet.has(r.place_name.toLowerCase()));
-    if (filtered.length < 3) {
+    if (filtered.length < 5) {
       const expandedRadius = Math.min(radius * 2, 3000);
       console.log(`[recommend] expanding radius to ${expandedRadius}m (only ${filtered.length} results)`);
       const expanded = await fetchNearbyRestaurants(lat, lng, expandedRadius, category);
@@ -231,7 +231,7 @@ export async function POST(req: NextRequest) {
 - 인원: ${peopleLabel[people] || people}
 - 가격대: ${priceLabel[price] || price}
 
-이 조건에 맞는 음식점 3곳과 각각의 대표 메뉴를 추천해주세요.
+이 조건에 맞는 음식점 5곳과 각각의 대표 메뉴를 추천해주세요.
 각 추천은 서로 다른 스타일이어야 합니다. 인원과 가격대를 고려해주세요.
 친근하고 재미있는 말투로 추천 이유를 1문장으로 작성해주세요.`,
         });
@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
 - 인원: ${peopleLabel[people] || people}
 - 가격대: ${priceLabel[price] || price}
 
-아래 실제 주변 음식점 리스트에서 3곳을 골라 추천해주세요:
+아래 실제 주변 음식점 리스트에서 5곳을 골라 추천해주세요:
 ${restaurantList}
 
 반드시 위 리스트에 있는 음식점만 추천하세요.
